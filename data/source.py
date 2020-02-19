@@ -17,6 +17,7 @@ class Source:
         self.data_deaths = requests.get(self.directory['deaths'])
         self.data_recovered = requests.get(self.directory['recovered'])
         self.data = None
+        self.first_day = None
 
     def get_confirmed_data(self):
         self.data = self.data_confirmed
@@ -61,6 +62,7 @@ class Source:
                 if province[0] == 'Province/State':
                     row_data = [datetime.strptime(j.strip(), '%m/%d/%y').timestamp() for j in r2[4:l]]
                     row_data = np.asarray(row_data, dtype='float')
+                    self.first_day = row_data[0]
                     row_data -= row_data[0]
                     row_data /= (24*3600)
                 else:

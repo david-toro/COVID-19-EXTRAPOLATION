@@ -31,7 +31,7 @@ class Predictor:
 
         return np.array([val[0], poly.polyval(val[0], c)])
 
-    def exponential_model(self):
+    def exponential_regression(self):
         # get regression
         first_col = np.ones((self.x.shape[0], 1))
         a = np.append(first_col, self.x, axis=1)
@@ -54,7 +54,7 @@ class Predictor:
         return np.array([val[0], c[0]*np.power(c[1], val[0])])
 
 
-if __name__== "__main__":
-    p = Predictor(7, np.array([[1, 2, 3], [1, 4, 9]]))
+if __name__ == "__main__":
+    p = Predictor(7, np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144]]))
     print(p.polynomial_regression(2))
-    print(p.exponential_model())
+    print(p.exponential_regression())

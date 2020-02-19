@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from predictor import predictor as p
 from data import source
+from datetime import datetime
 
 
 def label_outer(ax):
@@ -70,12 +71,21 @@ class MultiplePlots:
                         elif model == 'polynomial_5':
                             u = pred.polynomial_regression(5)
                         elif model == 'exponential':
-                            u = pred.exponential_model()
+                            u = pred.exponential_regression()
                         else:
                             # default polynomial_1
                             u = pred.polynomial_regression(1)
 
                         axs[i, j].plot(u[0], u[1], 'r')
+
+                        print('\n', k[k_index])
+                        day_num = self.s.first_day + 24*3600*(u[0][-days:])
+
+                        print('time range:', datetime.fromtimestamp(day_num[0]).date(), '-',
+                              datetime.fromtimestamp(day_num[-1]).date())
+
+                        print('predictions:',
+                              u[1][-days:])
 
                         k_index += 1
 
