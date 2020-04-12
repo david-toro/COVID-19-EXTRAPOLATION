@@ -56,6 +56,10 @@ class MultiplePlots:
                         axs[i, j].axis('off')
                     else:
                         y = d[k[k_index]]
+
+                        if y is None:
+                            continue
+
                         axs[i, j].plot(x, y, '.')
                         axs[i, j].set_title(k[k_index])
 
@@ -100,3 +104,9 @@ class MultiplePlots:
             # Hide x labels and tick labels for top plots and y ticks for right plots.
             for ax in axs.flat:
                 label_outer(ax)
+
+
+if __name__ == "__main__":
+    days = 3
+    z = MultiplePlots()
+    z.plot('exponential', days, 'confirmed')

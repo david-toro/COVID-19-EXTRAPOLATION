@@ -6,9 +6,9 @@ import copy
 
 class Source:
 
-    directory = {'confirmed':'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv',
-                 'deaths':'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv',
-                 'recovered':'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv'
+    directory = {'confirmed':'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
+                 'deaths':'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
+                 'recovered':'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
                  }
 
     def __init__(self):
@@ -42,8 +42,7 @@ class Source:
         else:
             r1 = self.data.text.strip().split('\n')
 
-            mainland_china = None
-            out_of_mainland_china = None
+            total = None
 
             for i in r1:
                 r2 = i.split(',')
@@ -52,12 +51,15 @@ class Source:
                 if r2[0].startswith('\"'):
                     province = (r2[0]+","+r2[1], r2[2])
                     r2.pop(0)
+                elif r2[1].startswith('\"'):
+                    province = (r2[0], r2[1]+","+r2[2])
+                    r2.pop(0)
                 else:
                     province = (r2[0], r2[1])
 
                 # print('\n', province, '\n')
 
-                row_data= []
+                row_data = []
 
                 if province[0] == 'Province/State':
                     row_data = [datetime.strptime(j.strip(), '%m/%d/%y').timestamp() for j in r2[4:l]]
@@ -69,19 +71,27 @@ class Source:
                     row_data = [(float(j) if j else 0.0) for j in r2[4:l]]
                     row_data = np.asarray(row_data, dtype='float')
 
-                # print(row_data)
+                # print(province[1])
+                # print(row_data.shape)
                 self.d.update({province : row_data})
 
-                if province[1] == 'Mainland China':
-                    if mainland_china is None:
-                        mainland_china = row_data.copy()
-                    else:
-                        mainland_china += row_data.copy()
-                elif province[1] != 'Country/Region':
-                    if out_of_mainland_china is None:
-                        out_of_mainland_china = row_data.copy()
-                    else:
-                        out_of_mainland_china += row_data.copy()
+                if total is None:
+                    total = row_data.copy()
+                else:
+                    total += row_data.copy()
 
-            self.d.update({('Total', 'Mainland China'): mainland_china})
-            self.d.update({('Total', 'Out of Mainland China'): out_of_mainland_china})
+            self.d.update({('Total', 'Total'): total})
+
+
+if __name__ == "__main__":
+    s = Source()
+
+    if '404: Not Found' in s.data_confirmed.text:
+        print('please update the URL for data if necessary')
+    else:
+        # print(s.data_confirmed.text)
+        # print(s.data_deaths.text)
+        # print(s.data_recovered.text)
+        print(s.get_confirmed_data())
+        print(s.get_deaths_data())
+        print(s.get_recovered_data())
