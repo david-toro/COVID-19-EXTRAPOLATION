@@ -60,10 +60,15 @@ class MultiplePlots:
                         if y is None:
                             continue
 
-                        axs[i, j].plot(x, y, '.')
+                        pred = p.Predictor(days, np.array([x, y]))
+
+                        if model == 'gaussian':
+                            axs[i, j].plot(x, pred.derivative(), 'b.')
+                        else:
+                            axs[i, j].plot(x, y, 'b.')
+
                         axs[i, j].set_title(k[k_index])
 
-                        pred = p.Predictor(days, np.array([x, y]))
                         u = None
 
                         if model == 'polynomial_2':
@@ -76,6 +81,8 @@ class MultiplePlots:
                             u = pred.polynomial_regression(5)
                         elif model == 'exponential':
                             u = pred.exponential_regression()
+                        elif model == 'gaussian':
+                            u = pred.gaussian()
                         else:
                             # default polynomial_1
                             u = pred.polynomial_regression(1)
@@ -109,4 +116,4 @@ class MultiplePlots:
 if __name__ == "__main__":
     days = 3
     z = MultiplePlots()
-    z.plot('exponential', days, 'confirmed')
+    z.plot('gaussian', days, 'confirmed')
